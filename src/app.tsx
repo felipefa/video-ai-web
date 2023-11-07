@@ -1,4 +1,5 @@
 import { Github, Wand2 } from 'lucide-react';
+import React from 'react';
 
 import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
@@ -16,8 +17,14 @@ import { PromptSelect } from './components/promptSelect';
 import { VideoInputForm } from './components/videoInputForm';
 
 export function App() {
+  const [temperature, setTemperature] = React.useState(0.5);
+
   function onHandlePromptSelection(template: string) {
     console.log(template);
+  }
+
+  function onHandleTemperatureChange(temperatures: number[]) {
+    setTemperature(temperatures[0]);
   }
 
   return (
@@ -99,7 +106,13 @@ export function App() {
 
             <div className="space-y-4">
               <Label>Temperature</Label>
-              <Slider min={0} max={1} step={0.1} />
+              <Slider
+                min={0}
+                max={1}
+                onValueChange={onHandleTemperatureChange}
+                step={0.1}
+                value={[temperature]}
+              />
               <span className="block text-xs text-muted-foreground italic">
                 Higher values will make the AI more creative and possibly less
                 accurate.
