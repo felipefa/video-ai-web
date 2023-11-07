@@ -18,6 +18,7 @@ import { VideoInputForm } from './components/videoInputForm';
 
 export function App() {
   const [temperature, setTemperature] = React.useState(0.5);
+  const [videoId, setVideoId] = React.useState<string | null>(null);
 
   function onHandlePromptSelection(template: string) {
     console.log(template);
@@ -77,7 +78,7 @@ export function App() {
         </div>
 
         <aside className="w-80 space-y-6">
-          <VideoInputForm />
+          <VideoInputForm onVideoUploaded={setVideoId} />
 
           <Separator />
 

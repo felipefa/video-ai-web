@@ -12,6 +12,10 @@ import { api } from '@/lib/axios';
 
 type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success';
 
+type VideoInputFormProps = {
+  onVideoUploaded: (videoId: string) => void;
+};
+
 const statusMessage = {
   converting: 'Converting...',
   uploading: 'Uploading...',
@@ -19,7 +23,7 @@ const statusMessage = {
   success: 'Success!',
 };
 
-export function VideoInputForm() {
+export function VideoInputForm(props: VideoInputFormProps) {
   const [videoFile, setVideoFile] = React.useState<File | null>(null);
   const [status, setStatus] = React.useState<Status>('waiting');
 
@@ -102,6 +106,8 @@ export function VideoInputForm() {
     await api.post(`/videos/${videoId}/transcription`, { prompt });
 
     setStatus('success');
+
+    props.onVideoUploaded(videoId);
   }
 
   const previewUrl = React.useMemo(
