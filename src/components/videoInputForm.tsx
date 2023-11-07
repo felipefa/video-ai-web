@@ -102,8 +102,6 @@ export function VideoInputForm() {
     await api.post(`/videos/${videoId}/transcription`, { prompt });
 
     setStatus('success');
-
-    console.log('Transcription complete', videoId);
   }
 
   const previewUrl = React.useMemo(
