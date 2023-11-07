@@ -10,8 +10,18 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { api } from '@/lib/axios';
 
+type Status = 'waiting' | 'converting' | 'uploading' | 'generating' | 'success';
+
+const statusMessage = {
+  converting: 'Converting...',
+  uploading: 'Uploading...',
+  generating: 'Transcribing...',
+  success: 'Success!',
+};
+
 export function VideoInputForm() {
   const [videoFile, setVideoFile] = React.useState<File | null>(null);
+  const [status, setStatus] = React.useState<Status>('waiting');
 
   const promptInputRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -73,17 +83,25 @@ export function VideoInputForm() {
       return;
     }
 
+    setStatus('converting');
+
     const audioFile = await convertVideoToAudio(videoFile);
 
     const formData = new FormData();
 
     formData.append('file', audioFile);
 
+    setStatus('uploading');
+
     const response = await api.post('/videos', formData);
 
     const videoId = response.data?.video.id;
 
+    setStatus('generating');
+
     await api.post(`/videos/${videoId}/transcription`, { prompt });
+
+    setStatus('success');
 
     console.log('Transcription complete', videoId);
   }
@@ -126,6 +144,7 @@ export function VideoInputForm() {
       <div className="space-y-2">
         <Label htmlFor="transcription_prompt">Transcription Prompt</Label>
         <Textarea
+          disabled={status !== 'waiting'}
           ref={promptInputRef}
           id="transcription_prompt"
           className="h-20 leading-relaxed resize-none"
@@ -133,9 +152,20 @@ export function VideoInputForm() {
         />
       </div>
 
-      <Button className="w-full" type="submit">
-        Upload video
-        <Upload className="w-4 h-4 ml-2" />
+      <Button
+        className="w-full data-[success=true]:bg-emerald-300"
+        data-success={status === 'success'}
+        disabled={status !== 'waiting'}
+        type="submit"
+      >
+        {status === 'waiting' ? (
+          <>
+            Upload video
+            <Upload className="w-4 h-4 ml-2" />
+          </>
+        ) : (
+          statusMessage[status]
+        )}
       </Button>
     </form>
   );
